@@ -1,0 +1,889 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Tercih Robotu — Geleceğinizi Birlikte Tasarlayalım</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Barlow:wght@300;400;500;600&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+<style>
+  @font-face {
+    font-family: 'Dirtyline';
+    src: url('https://fonts.cdnfonts.com/s/15011/Dirtyline36DaysofType.woff') format('woff');
+    font-weight: normal; font-style: normal; font-display: swap;
+  }
+
+  :root {
+    --coral: oklch(0.74 0.14 35);
+    --coral-soft: oklch(0.74 0.14 35 / 0.18);
+    --emerald: oklch(0.74 0.13 160);
+    --amber: oklch(0.82 0.13 80);
+    --sky: oklch(0.78 0.10 230);
+  }
+
+  html, body, #root { background:#000; }
+  body { font-family: 'Barlow', sans-serif; color:#fff; -webkit-font-smoothing: antialiased; }
+
+  .font-display { font-family: 'Dirtyline', 'Instrument Serif', serif; }
+  .font-inter   { font-family: 'Inter', sans-serif; }
+  .font-serif-i { font-family: 'Instrument Serif', serif; font-style: italic; }
+  .font-mono    { font-family: 'JetBrains Mono', monospace; }
+
+  .liquid-glass {
+    background: rgba(255,255,255,0.01);
+    background-blend-mode: luminosity;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: none;
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.1);
+    position: relative;
+    overflow: hidden;
+  }
+  .liquid-glass::before {
+    content: "";
+    position: absolute; inset: 0;
+    border-radius: inherit;
+    padding: 1.4px;
+    background: linear-gradient(180deg,
+      rgba(255,255,255,0.45) 0%,
+      rgba(255,255,255,0.15) 20%,
+      rgba(255,255,255,0) 40%,
+      rgba(255,255,255,0) 60%,
+      rgba(255,255,255,0.15) 80%,
+      rgba(255,255,255,0.45) 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .hero-line { font-size: clamp(40px, 5.4vw, 76px); line-height: 1.05; letter-spacing: -0.025em; }
+
+  @keyframes marquee { from { transform: translateX(0);} to { transform: translateX(-50%);} }
+  .marquee-track { animation: marquee 48s linear infinite; }
+
+  .img-placeholder {
+    background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.05) 0 8px, rgba(255,255,255,0.02) 8px 16px);
+    background-color: #0c0c0c;
+  }
+
+  /* Native form controls reskin */
+  input, select { color: #fff; }
+  input::placeholder { color: rgba(255,255,255,0.4); }
+  select option { background:#0a0a0a; color:#fff; }
+
+  details > summary { list-style: none; cursor:pointer; }
+  details > summary::-webkit-details-marker { display:none; }
+  details[open] .faq-chev { transform: rotate(45deg); }
+  .faq-chev { transition: transform .25s ease; }
+
+  .check-chip:has(input:checked) { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.5); }
+  .check-chip:has(input:checked) .dot { background: var(--coral); border-color: var(--coral); }
+
+  .material-icons-outlined { font-family: 'Material Icons Outlined'; font-weight: normal; font-style: normal; font-size: 18px; line-height: 1; letter-spacing: normal; text-transform: none; display: inline-block; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-feature-settings: 'liga'; -webkit-font-smoothing: antialiased; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" data-presets="env,react">
+const { useEffect, useRef, useState } = React;
+
+/* ---------- Icons ---------- */
+const MI = ({ name, className="", style }) => (
+  <span className={"material-icons-outlined " + className} style={style}>{name}</span>
+);
+const SearchIcon = ({ size=14 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>
+  </svg>
+);
+const ArrowRight = ({ size=14 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+  </svg>
+);
+const Plus = ({ size=14 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
+);
+
+/* ---------- HEADER ---------- */
+function Header() {
+  const links = ['ANASAYFA','SONUÇLAR','TRENDLER','ÜNİVERSİTE','BLOG'];
+  return (
+    <header className="fixed top-0 inset-x-0 z-50 px-10 py-8 flex justify-between items-center">
+      <a href="#" className="text-[17px] font-semibold tracking-tight text-white">
+        Tercih<span className="font-serif-i text-white/70">.</span>robotu
+        <sup className="text-[9px] font-medium ml-0.5 align-super">TR</sup>
+      </a>
+      <nav className="liquid-glass rounded-full px-2 py-2 hidden md:flex items-center gap-1">
+        {links.map(l => (
+          <a key={l} href="#" className="text-[11px] font-medium text-white/90 hover:text-white px-4 py-1.5 rounded-full transition-colors duration-200" style={{letterSpacing:'0.12em'}}>
+            {l}
+          </a>
+        ))}
+      </nav>
+      <a href="/kayit" className="liquid-glass rounded-full px-5 py-2.5 text-[11px] font-medium text-white/90 hover:text-white" style={{letterSpacing:'0.12em'}}>
+        ÜCRETSİZ KAYIT
+      </a>
+    </header>
+  );
+}
+
+/* ---------- HERO + VIDEO BG ---------- */
+function Hero() {
+  const videoRef = useRef(null);
+  const wrapRef  = useRef(null);
+  const [shown, setShown] = useState(false);
+
+  useEffect(() => {
+    setShown(true);
+    const s = { tx:0, ty:0, cx:0, cy:0 };
+    const onMove = (e) => {
+      const cxv = window.innerWidth/2, cyv = window.innerHeight/2;
+      s.tx = ((e.clientX - cxv)/cxv) * 14;
+      s.ty = ((e.clientY - cyv)/cyv) * 14;
+    };
+    window.addEventListener('mousemove', onMove);
+    let raf;
+    const loop = () => {
+      s.cx += (s.tx - s.cx)*0.06;
+      s.cy += (s.ty - s.cy)*0.06;
+      if (wrapRef.current && window.gsap) window.gsap.set(wrapRef.current, { x: s.cx, y: s.cy });
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => { window.removeEventListener('mousemove', onMove); cancelAnimationFrame(raf); };
+  }, []);
+
+  const onLoaded = () => { if (videoRef.current) videoRef.current.playbackRate = 1.15; };
+
+  return (
+    <section className="relative min-h-screen w-full overflow-hidden">
+      {/* Video bg */}
+      <div ref={wrapRef} className="absolute inset-0 z-0 scale-[1.08] origin-center">
+        <video ref={videoRef}
+          src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260510_060007_60275ce7-030c-4668-a160-8f364ec537d3.mp4"
+          autoPlay muted loop playsInline onLoadedMetadata={onLoaded}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0" style={{background:"radial-gradient(ellipse at center, rgba(0,0,0,0.25) 30%, rgba(0,0,0,0.85) 100%)"}}></div>
+        <div className="absolute inset-x-0 top-0 h-48" style={{background:"linear-gradient(180deg, rgba(0,0,0,0.65), transparent)"}}></div>
+        <div className="absolute inset-x-0 bottom-0 h-80" style={{background:"linear-gradient(0deg, #000 5%, rgba(0,0,0,0.85) 35%, transparent)"}}></div>
+      </div>
+
+      {/* Decorative coral blurs */}
+      <div aria-hidden className="hidden lg:block absolute -left-12 top-32 z-[1] w-[420px] h-[420px] rounded-full opacity-30" style={{background:"radial-gradient(circle, var(--coral) 0%, transparent 65%)", filter:"blur(60px)"}}/>
+      <div aria-hidden className="hidden lg:block absolute -right-8 bottom-40 z-[1] w-[380px] h-[380px] rounded-full opacity-25" style={{background:"radial-gradient(circle, oklch(0.7 0.12 200) 0%, transparent 65%)", filter:"blur(60px)"}}/>
+
+      {/* Headline */}
+      <div className={`relative z-20 pt-44 px-6 text-center transition-all duration-1000 ${shown ? 'opacity-100 translate-y-0':'opacity-0 translate-y-6'}`}>
+        <div className="inline-flex items-center gap-2 liquid-glass rounded-full px-3 py-1.5 mb-7 text-[10px] font-medium" style={{letterSpacing:'0.16em'}}>
+          <span className="w-1.5 h-1.5 rounded-full" style={{background:'var(--coral)'}}></span>
+          <span className="text-white/80">2025 ÖSYM VERİLERİ · CANLI</span>
+        </div>
+
+        <h1 className="font-inter hero-line font-normal text-white max-w-[1100px] mx-auto">
+          Geleceğinizi <span className="font-serif-i text-white/85">birlikte</span> tasarlayalım.
+        </h1>
+        <p className="mt-6 text-[17px] md:text-[19px] text-white/65 max-w-[640px] mx-auto leading-relaxed">
+          Türkiye'nin en kapsamlı üniversite tercih robotu — sıralamanızdan başlayın,
+          beş yıllık taban verisiyle gerçek programları görün.
+        </p>
+
+        {/* Stat pills */}
+        <div className={`mt-10 flex flex-wrap justify-center gap-3 transition-all duration-1000 delay-200 ${shown ? 'opacity-100 translate-y-0':'opacity-0 translate-y-4'}`}>
+          {[
+            { n:'11.500+', l:'Program' },
+            { n:'200+',    l:'Üniversite' },
+            { n:'5 Yıllık',l:'Veri' },
+          ].map(s => (
+            <div key={s.l} className="liquid-glass rounded-full px-5 py-2.5 flex items-center gap-2.5">
+              <span className="font-inter text-[15px] font-medium text-white">{s.n}</span>
+              <span className="w-px h-3 bg-white/25"></span>
+              <span className="text-[12px] text-white/65" style={{letterSpacing:'0.06em'}}>{s.l}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Search form */}
+      <SearchForm shown={shown}/>
+    </section>
+  );
+}
+
+/* ---------- SEARCH FORM ---------- */
+function SearchForm({ shown }) {
+  return (
+    <form id="ara" action="/sonuclar" method="GET"
+      className={`relative z-20 mx-auto mt-14 mb-24 max-w-[1100px] px-6 transition-all duration-1000 delay-300 ${shown ? 'opacity-100 translate-y-0':'opacity-0 translate-y-6'}`}>
+      <div className="liquid-glass rounded-3xl p-6 md:p-8">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <span className="w-8 h-px bg-white/40"></span>
+            <span className="text-[11px] font-medium text-white/55" style={{letterSpacing:'0.18em'}}>TERCİH ARAMA</span>
+          </div>
+          <span className="font-mono text-[10px] text-white/45">/sonuclar</span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Field label="Sıralamanız (Min)" hint="Örn: 50000">
+            <input type="number" name="siralama" placeholder="Örn: 50000"
+              className="w-full bg-transparent outline-none text-[15px] py-2 placeholder:text-white/35"/>
+          </Field>
+
+          <Field label="Puan Türü" required>
+            <select name="puan" required defaultValue=""
+              className="w-full bg-transparent outline-none text-[15px] py-2 appearance-none cursor-pointer">
+              <option value="" disabled className="text-white/40">Seçiniz</option>
+              <option value="SAY">SAY · Sayısal</option>
+              <option value="EA">EA · Eşit Ağırlık</option>
+              <option value="SOZ">SÖZ · Sözel</option>
+              <option value="DIL">DİL · Yabancı Dil</option>
+            </select>
+          </Field>
+
+          <Field label="Şehir">
+            <Combobox name="sehir" placeholder="Şehir seçiniz…" options={['İstanbul','Ankara','İzmir','Bursa','Antalya','Eskişehir','Konya','Trabzon','Gaziantep','Adana']}/>
+          </Field>
+
+          <Field label="Bölüm">
+            <Combobox name="bolum" placeholder="Bölüm ara…" options={['Bilgisayar Mühendisliği','Elektrik-Elektronik Müh.','Endüstri Mühendisliği','Tıp','Hukuk','Psikoloji','İşletme','Mimarlık','Makine Mühendisliği','Yazılım Mühendisliği']}/>
+          </Field>
+        </div>
+
+        <div className="mt-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+          <div className="lg:col-span-2">
+            <Label>Üniversite Türü</Label>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <CheckChip name="tur" value="devlet" label="Devlet" defaultChecked/>
+              <CheckChip name="tur" value="vakif" label="Vakıf" defaultChecked/>
+              <CheckChip name="tur" value="kktc" label="KKTC"/>
+            </div>
+          </div>
+
+          <Field label="Burs">
+            <select name="burs" defaultValue="tumu"
+              className="w-full bg-transparent outline-none text-[15px] py-2 appearance-none cursor-pointer">
+              <option value="tumu">Tümü</option>
+              <option value="burslu">Burslu</option>
+              <option value="indirim">%50 İndirimli</option>
+              <option value="ucretli">Ücretli</option>
+            </select>
+          </Field>
+
+          <Field label="Üniversite">
+            <Combobox name="universite" placeholder="Üniversite adı…" options={['Boğaziçi Üniversitesi','İTÜ','ODTÜ','Bilkent','Hacettepe','İstanbul Üniversitesi','Ankara Üniversitesi','Koç','Sabancı','Ege']}/>
+          </Field>
+        </div>
+
+        <div className="mt-7 flex flex-col-reverse md:flex-row md:items-center md:justify-between gap-4">
+          <div className="text-[12px] text-white/50">
+            Filtrelerinizi temizlemek için
+            <button type="reset" className="ml-1 underline-offset-4 hover:underline text-white/80">sıfırla</button>.
+          </div>
+          <button type="submit"
+            className="inline-flex items-center justify-center gap-2 bg-white text-black text-[15px] font-medium rounded-full px-7 py-3.5 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] hover:shadow-[0_0_32px_4px_rgba(255,255,255,0.18)]">
+            <SearchIcon size={14}/> Sonuçları Listele
+          </button>
+        </div>
+      </div>
+    </form>
+  );
+}
+
+/* ---------- Form atoms ---------- */
+function Label({ children, required }) {
+  return (
+    <label className="text-[10px] font-medium text-white/55 flex items-center gap-1" style={{letterSpacing:'0.16em'}}>
+      <span>{children?.toString().toUpperCase()}</span>
+      {required && <span className="text-[color:var(--coral)]">*</span>}
+    </label>
+  );
+}
+function Field({ label, required, children, hint }) {
+  return (
+    <div className="bg-white/[0.025] border border-white/10 rounded-2xl px-4 py-3 focus-within:border-white/40 transition-colors">
+      <Label required={required}>{label}</Label>
+      <div className="mt-1">{children}</div>
+    </div>
+  );
+}
+function CheckChip({ name, value, label, defaultChecked }) {
+  return (
+    <label className="check-chip cursor-pointer inline-flex items-center gap-2 border border-white/15 rounded-full px-4 py-2 text-[13px] text-white/85 hover:text-white transition">
+      <input type="checkbox" name={name} value={value} defaultChecked={defaultChecked} className="sr-only"/>
+      <span className="dot w-3 h-3 rounded-full border border-white/30 inline-block transition-colors"></span>
+      <span>{label}</span>
+    </label>
+  );
+}
+function Combobox({ name, placeholder, options }) {
+  const [v, setV] = useState('');
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    const onDoc = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', onDoc);
+    return () => document.removeEventListener('mousedown', onDoc);
+  }, []);
+  const filtered = options.filter(o => o.toLowerCase().includes(v.toLowerCase())).slice(0,6);
+  return (
+    <div className="relative" ref={ref}>
+      <input
+        type="text" name={name} value={v} placeholder={placeholder}
+        onChange={e => { setV(e.target.value); setOpen(true); }}
+        onFocus={() => setOpen(true)}
+        autoComplete="off"
+        className="w-full bg-transparent outline-none text-[15px] py-2 placeholder:text-white/35"
+      />
+      {open && filtered.length > 0 && (
+        <div className="absolute left-0 right-0 top-full mt-2 z-30 liquid-glass rounded-xl py-1 max-h-[220px] overflow-auto bg-black/80">
+          {filtered.map(o => (
+            <button type="button" key={o}
+              className="w-full text-left px-4 py-2 text-[14px] text-white/85 hover:bg-white/10"
+              onClick={() => { setV(o); setOpen(false); }}>
+              {o}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ---------- UNIVERSITY MARQUEE ---------- */
+function UniLogo({ slug, abbr, hue }) {
+  return (
+    <a href={`/universite/${slug}`} className="shrink-0 w-16 h-16 rounded-2xl liquid-glass flex items-center justify-center opacity-70 hover:opacity-100 transition" title={slug}>
+      <span className="font-inter text-[14px] font-semibold" style={{color:`oklch(0.85 0.06 ${hue})`}}>{abbr}</span>
+    </a>
+  );
+}
+function Marquee() {
+  const unis = [
+    ['bogazici','BÜ',240],['itu','İTÜ',30],['odtu','ODTÜ',140],['bilkent','BLK',60],
+    ['hacettepe','HÜ',0],['istanbul','İÜ',280],['ankara','AÜ',200],['ege','EGE',120],
+    ['koc','KOÇ',340],['sabanci','SAB',20],['gazi','GAZİ',180],['dokuz-eylul','DEÜ',220],
+    ['marmara','MÜ',300],['yildiz','YTÜ',80],['bilgi','BLG',260],['galatasaray','GSÜ',40],
+  ];
+  const row = [...unis, ...unis];
+  return (
+    <section className="relative bg-black py-20 border-t border-white/10">
+      <div className="text-center mb-10">
+        <div className="inline-flex items-center gap-3 text-white/50 text-[11px] font-medium" style={{letterSpacing:'0.18em'}}>
+          <span className="w-8 h-px bg-white/40"></span>
+          <span>200+ ÜNİVERSİTE, TEK ÇATI ALTINDA</span>
+          <span className="w-8 h-px bg-white/40"></span>
+        </div>
+      </div>
+      <div className="relative overflow-hidden">
+        <div className="marquee-track flex gap-6 will-change-transform">
+          {row.map((u,i) => <UniLogo key={i} slug={u[0]} abbr={u[1]} hue={u[2]}/>)}
+        </div>
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-32" style={{background:'linear-gradient(90deg,#000,transparent)'}}/>
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-32" style={{background:'linear-gradient(270deg,#000,transparent)'}}/>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- SECTION INTRO ---------- */
+function Intro() {
+  return (
+    <section className="relative bg-black text-white py-28 px-10 overflow-hidden">
+      <div className="max-w-[1280px] mx-auto grid grid-cols-12 gap-10">
+        <div className="col-span-12 md:col-span-5">
+          <div className="flex items-center gap-3 text-[11px] font-medium" style={{letterSpacing:'0.18em', color:'var(--coral)'}}>
+            <span className="w-8 h-px" style={{background:'var(--coral)'}}></span>
+            <span>NELER SUNUYORUZ</span>
+          </div>
+          <h2 className="font-inter mt-8 text-[clamp(36px,4.4vw,62px)] leading-[1.04] tracking-[-0.02em]">
+            Tercih süreci karmaşıktır.<br/>
+            <span className="font-serif-i text-white/75">Doğru karar olmak zorunda değil.</span>
+          </h2>
+        </div>
+        <div className="col-span-12 md:col-span-6 md:col-start-7 self-end">
+          <p className="text-[17px] leading-[1.7] text-white/70 max-w-[540px]">
+            ÖSYM'nin son beş yıllık taban puan ve sıralama verisini, 200+ üniversite ve
+            11.500+ program için tek bir tutarlı arayüzde topladık. Tercih listeniz
+            tahmine değil, hareket eden gerçek sayılara dayansın.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- FEATURE 01 — EŞLEŞTİRME ---------- */
+function Feature01() {
+  const rows = [
+    { abbr:'DE', prog:'Elektrik-Elektronik Müh.', uni:'Dokuz Eylül Üniversitesi', rank:'2025 · 42.118', status:'Yerleşilebilir', tone:'emerald' },
+    { abbr:'İÜ', prog:'Bilgisayar Mühendisliği',  uni:'İÜ-Cerrahpaşa',           rank:'2025 · 44.207', status:'Yerleşilebilir', tone:'emerald' },
+    { abbr:'EG', prog:'Makine Mühendisliği',      uni:'Ege Üniversitesi',         rank:'2025 · 46.890', status:'Hedef',         tone:'amber' },
+    { abbr:'AÜ', prog:'Yazılım Mühendisliği',     uni:'Ankara Üniversitesi',      rank:'2025 · 49.733', status:'Güvenli',       tone:'sky' },
+  ];
+  const tone = (t) => t==='emerald'?'var(--emerald)':t==='amber'?'var(--amber)':'var(--sky)';
+
+  return (
+    <section className="relative bg-black text-white px-10 py-24">
+      <div className="max-w-[1280px] mx-auto grid grid-cols-12 gap-10 items-center">
+        <div className="col-span-12 lg:col-span-5">
+          <div className="flex items-center gap-3 text-[11px] font-medium" style={{letterSpacing:'0.18em', color:'var(--coral)'}}>
+            <span className="font-mono text-white/60">01 — EŞLEŞTİRME</span>
+          </div>
+          <h3 className="font-inter mt-6 text-[clamp(30px,3.6vw,52px)] tracking-[-0.02em] leading-[1.08]">
+            Sıralamanıza göre yerleşebileceğiniz programlar,<br/>
+            <span className="font-serif-i text-white/75">saniyeler içinde.</span>
+          </h3>
+          <p className="mt-6 text-white/65 text-[16px] leading-relaxed max-w-[480px]">
+            Sıralama, puan türü ve filtrelerinizi girin; ÖSYM verisiyle yerleşme
+            ihtimaliniz yüksek programları renkli bir hassasiyet skalasında listeleyelim.
+          </p>
+          <ul className="mt-8 space-y-3 text-[15px] text-white/85">
+            {['Yerleşilebilir, hedef ve güvenli olarak ayrılan akıllı puanlama.','Son 5 yılın tüm taban sıralama hareketleri eşleştirmeye dahil.','Devlet / Vakıf / KKTC ve burs durumuna göre tek tıkla filtre.'].map((t,i) => (
+              <li key={i} className="flex gap-3">
+                <MI name="check_circle" style={{color:'var(--coral)'}} />
+                <span>{t}</span>
+              </li>
+            ))}
+          </ul>
+          <a href="/sonuclar" className="mt-9 inline-flex items-center gap-2 text-[13px] font-medium hover:gap-3 transition-all" style={{letterSpacing:'0.12em'}}>
+            SONUÇLARI GÖRÜNTÜLE <ArrowRight/>
+          </a>
+        </div>
+
+        {/* Mock card */}
+        <div className="col-span-12 lg:col-span-7">
+          <div className="liquid-glass rounded-3xl p-6 relative">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-[11px] text-white/50" style={{letterSpacing:'0.14em'}}>SORGU</div>
+                <div className="font-inter mt-1 text-[15px]">Sıralama 45.000 · SAY · Devlet</div>
+              </div>
+              <div className="text-right">
+                <div className="text-[11px] text-white/50" style={{letterSpacing:'0.14em'}}>BULUNAN</div>
+                <div className="font-inter mt-1 text-[15px]"><span className="font-serif-i" style={{color:'var(--coral)'}}>448</span> yerleşilebilir program</div>
+              </div>
+            </div>
+
+            <div className="mt-6 divide-y divide-white/8 border-y border-white/10">
+              {rows.map((r,i) => (
+                <div key={i} className="flex items-center gap-4 py-4">
+                  <div className="w-11 h-11 rounded-xl liquid-glass flex items-center justify-center font-inter text-[12px] font-semibold">
+                    {r.abbr}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-inter text-[14px] truncate">{r.prog}</div>
+                    <div className="text-[12px] text-white/55 truncate">{r.uni}</div>
+                  </div>
+                  <div className="hidden sm:block font-mono text-[11px] text-white/55">{r.rank}</div>
+                  <div className="text-[11px] font-medium px-3 py-1.5 rounded-full border" style={{color:tone(r.tone), borderColor:tone(r.tone)+'55', background:tone(r.tone)+'14', letterSpacing:'0.08em'}}>
+                    {r.status}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-4 flex items-center justify-between">
+              <span className="text-[12px] text-white/55">444 sonuç daha</span>
+              <span className="w-8 h-8 rounded-full liquid-glass flex items-center justify-center"><ArrowRight/></span>
+            </div>
+
+            {/* deco */}
+            <div aria-hidden className="pointer-events-none absolute -top-8 -right-8 w-40 h-40 rounded-full" style={{background:'radial-gradient(circle, var(--coral-soft), transparent 65%)', filter:'blur(20px)'}}/>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- FEATURE 02 — TREND CHART ---------- */
+function TrendChart() {
+  const data = [
+    { y:2021, v:243431 },
+    { y:2022, v:198122 },
+    { y:2023, v:142880 },
+    { y:2024, v:98443  },
+    { y:2025, v:66687  },
+  ];
+  const W=520, H=220, padX=44, padY=24;
+  const maxV = 250000;
+  const x = (i) => padX + (i*(W-padX-12))/(data.length-1);
+  const y = (v) => padY + (1 - v/maxV)*(H-padY*2);
+  const pts = data.map((d,i) => `${x(i)},${y(d.v)}`).join(' ');
+  const area = `M ${x(0)},${H-padY} L ${pts.replaceAll(' ',' L ')} L ${x(data.length-1)},${H-padY} Z`.replace(/L\s+L/g,'L');
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto">
+      <defs>
+        <linearGradient id="coralFill" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor="oklch(0.74 0.14 35)" stopOpacity="0.45"/>
+          <stop offset="100%" stopColor="oklch(0.74 0.14 35)" stopOpacity="0"/>
+        </linearGradient>
+      </defs>
+      {/* gridlines */}
+      {[50000,100000,150000,200000].map(g => (
+        <g key={g}>
+          <line x1={padX} x2={W-12} y1={y(g)} y2={y(g)} stroke="rgba(255,255,255,0.08)" strokeDasharray="2 4"/>
+          <text x={padX-8} y={y(g)+3} fontFamily="JetBrains Mono" fontSize="9" fill="rgba(255,255,255,0.4)" textAnchor="end">{(g/1000)}K</text>
+        </g>
+      ))}
+      {/* x labels */}
+      {data.map((d,i) => (
+        <text key={d.y} x={x(i)} y={H-6} fontFamily="JetBrains Mono" fontSize="9" fill="rgba(255,255,255,0.5)" textAnchor="middle">{d.y}</text>
+      ))}
+      {/* area */}
+      <path d={`M ${data.map((d,i)=>`${i===0?'':'L '}${x(i)} ${y(d.v)}`).join(' ')} L ${x(data.length-1)} ${H-padY} L ${x(0)} ${H-padY} Z`} fill="url(#coralFill)"/>
+      {/* line */}
+      <polyline points={pts} fill="none" stroke="oklch(0.74 0.14 35)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      {/* dots */}
+      {data.map((d,i) => (
+        <g key={d.y}>
+          <circle cx={x(i)} cy={y(d.v)} r="3.5" fill="#000" stroke="oklch(0.74 0.14 35)" strokeWidth="2"/>
+        </g>
+      ))}
+    </svg>
+  );
+}
+function Feature02() {
+  return (
+    <section className="relative bg-black text-white px-10 py-24 border-t border-white/10">
+      <div className="max-w-[1280px] mx-auto grid grid-cols-12 gap-10 items-center">
+        {/* Mock left */}
+        <div className="col-span-12 lg:col-span-7 order-2 lg:order-1">
+          <div className="liquid-glass rounded-3xl p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-[11px] text-white/50" style={{letterSpacing:'0.14em'}}>PROGRAM</div>
+                <div className="font-inter mt-1 text-[15px]">Ankara Üniversitesi · İstatistik · SAY</div>
+              </div>
+              <div className="text-[11px] font-medium px-3 py-1.5 rounded-full" style={{color:'var(--emerald)', background:'var(--emerald)' + '14', border:'1px solid ' + 'var(--emerald)' + '55', letterSpacing:'0.06em'}}>
+                ↗ 176.744 sıra zorlaştı
+              </div>
+            </div>
+            <div className="mt-5"><TrendChart/></div>
+            <div className="mt-5 grid grid-cols-3 divide-x divide-white/10 border-t border-white/10 pt-5">
+              <Stat label="2021 sıralaması" value="243.431"/>
+              <Stat label="2025 sıralaması" value="66.687"/>
+              <Stat label="5-yıl ort." value="132.909"/>
+            </div>
+          </div>
+        </div>
+
+        {/* Text right */}
+        <div className="col-span-12 lg:col-span-5 order-1 lg:order-2">
+          <div className="font-mono text-[11px] text-white/60" style={{letterSpacing:'0.18em'}}>02 — TREND ANALİZİ</div>
+          <h3 className="font-inter mt-6 text-[clamp(30px,3.6vw,52px)] tracking-[-0.02em] leading-[1.08]">
+            Bir programın geçmişini bilmeden,<br/>
+            <span className="font-serif-i text-white/75">geleceğine güvenmeyin.</span>
+          </h3>
+          <p className="mt-6 text-white/65 text-[16px] leading-relaxed max-w-[480px]">
+            Her programın 2021–2025 arası taban puan ve sıralama hareketini tek bir
+            grafikte görün. Yıllık dalgalanma, ortalama trend ve uç değer uyarılarıyla
+            sürprizleri tercih gününe bırakmayın.
+          </p>
+          <div className="mt-7 grid grid-cols-2 gap-3 max-w-[420px]">
+            <Tile k="5 yıl" v="Geçmiş veri"/>
+            <Tile k="Tüm" v="Bölümler için"/>
+          </div>
+          <a href="/trendler" className="mt-8 inline-flex items-center gap-2 text-[13px] font-medium hover:gap-3 transition-all" style={{letterSpacing:'0.12em'}}>
+            TRENDLERİ İNCELE <ArrowRight/>
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+const Stat = ({ label, value }) => (
+  <div className="px-4 first:pl-0 last:pr-0">
+    <div className="text-[10px] text-white/45" style={{letterSpacing:'0.16em'}}>{label.toUpperCase()}</div>
+    <div className="font-inter mt-1 text-[18px]">{value}</div>
+  </div>
+);
+const Tile = ({ k, v }) => (
+  <div className="border border-white/10 rounded-2xl px-4 py-3">
+    <div className="font-serif-i text-[22px] leading-none" style={{color:'var(--coral)'}}>{k}</div>
+    <div className="mt-1.5 text-[12px] text-white/60">{v}</div>
+  </div>
+);
+
+/* ---------- FEATURE 03 — UNI PROFILES ---------- */
+function Feature03() {
+  return (
+    <section className="relative bg-black text-white px-10 py-24 border-t border-white/10">
+      <div className="max-w-[1280px] mx-auto grid grid-cols-12 gap-10 items-center">
+        <div className="col-span-12 lg:col-span-5">
+          <div className="font-mono text-[11px] text-white/60" style={{letterSpacing:'0.18em'}}>03 — ÜNİVERSİTE PROFİLLERİ</div>
+          <h3 className="font-inter mt-6 text-[clamp(30px,3.6vw,52px)] tracking-[-0.02em] leading-[1.08]">
+            220+ üniversite,<br/>
+            <span className="font-serif-i text-white/75">tek bir tutarlı arayüzde.</span>
+          </h3>
+          <p className="mt-6 text-white/65 text-[16px] leading-relaxed max-w-[480px]">
+            Konumdan kontenjana, burs koşullarından resmi sayfa bağlantılarına kadar;
+            her üniversite için aynı dili konuşan, karşılaştırılabilir bir profil.
+          </p>
+          <ul className="mt-8 divide-y divide-white/10 border-y border-white/10">
+            {[
+              ['location_on','Konum, kampüs ve şehir bilgileri'],
+              ['payments','Burs ve ücretlendirme tabloları'],
+              ['groups','Kontenjan ve doluluk verileri'],
+              ['open_in_new','Resmi üniversite sitesine bağlantı'],
+            ].map(([icon,text]) => (
+              <li key={icon} className="flex items-center gap-4 py-4">
+                <span className="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center"><MI name={icon} style={{color:'var(--coral)'}}/></span>
+                <span className="text-[15px] text-white/85">{text}</span>
+              </li>
+            ))}
+          </ul>
+          <a href="/universite" className="mt-8 inline-flex items-center gap-2 text-[13px] font-medium hover:gap-3 transition-all" style={{letterSpacing:'0.12em'}}>
+            TÜM ÜNİVERSİTELERİ GÖRÜNTÜLE <ArrowRight/>
+          </a>
+        </div>
+
+        {/* Mock card */}
+        <div className="col-span-12 lg:col-span-7">
+          <div className="liquid-glass rounded-3xl overflow-hidden">
+            <div className="relative h-40" style={{background:'linear-gradient(135deg, oklch(0.18 0.03 250), oklch(0.10 0.01 250))'}}>
+              <div className="absolute inset-0" style={{background:'radial-gradient(circle at 30% 60%, var(--coral-soft), transparent 60%)'}}/>
+              <div className="absolute inset-0 opacity-30" style={{backgroundImage:'repeating-linear-gradient(135deg, rgba(255,255,255,0.06) 0 8px, transparent 8px 16px)'}}/>
+            </div>
+            <div className="px-6 pb-6 -mt-10 relative">
+              <div className="w-20 h-20 rounded-2xl liquid-glass flex items-center justify-center bg-black/60">
+                <span className="font-inter text-[20px] font-semibold">BÜ</span>
+              </div>
+              <h4 className="font-inter mt-5 text-[28px] tracking-tight">Boğaziçi Üniversitesi</h4>
+              <div className="mt-1 text-[13px] text-white/55" style={{letterSpacing:'0.04em'}}>İstanbul · Devlet · 1863</div>
+
+              <div className="mt-6 grid grid-cols-3 gap-3">
+                {[['41','Bölüm'],['904','Kontenjan'],['1863','Kuruluş']].map(([k,v],i) => (
+                  <div key={i} className="border border-white/10 rounded-2xl px-4 py-3">
+                    <div className="font-inter text-[22px]">{k}</div>
+                    <div className="text-[11px] text-white/55 mt-1" style={{letterSpacing:'0.08em'}}>{v.toUpperCase()}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-6 flex gap-3">
+                <button className="bg-white text-black text-[13px] font-medium rounded-full px-5 py-2.5 hover:scale-[1.02] transition">Bölümler</button>
+                <button className="liquid-glass text-white text-[13px] font-medium rounded-full px-5 py-2.5">Kontenjanlar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- HOW IT WORKS ---------- */
+function HowItWorks() {
+  const steps = [
+    { k:'01', t:'Sıralamanızı girin', d:'YKS sıralamanız, puan türünüz ve filtrelerinizle birkaç saniyede başlayın. Hesap açmadan deneyebilirsiniz.' },
+    { k:'02', t:'Programları keşfedin', d:'Gerçek 2025 yerleşme verisiyle programlara dalın, beş yıllık trendleri okuyun, üniversite profillerini inceleyin.' },
+    { k:'03', t:'Listenizi kaydedin', d:'Beğendiğiniz programları kendi tercih listenize ekleyin. Hesabınızla tüm cihazlar arasında senkronlanır.' },
+  ];
+  return (
+    <section className="relative bg-black text-white px-10 py-28 border-t border-white/10">
+      <div className="max-w-[1280px] mx-auto">
+        <div className="grid grid-cols-12 gap-10 mb-16">
+          <div className="col-span-12 md:col-span-7">
+            <div className="flex items-center gap-3 text-[11px] font-medium" style={{letterSpacing:'0.18em', color:'var(--coral)'}}>
+              <span className="w-8 h-px" style={{background:'var(--coral)'}}></span>
+              <span>NASIL ÇALIŞIR</span>
+            </div>
+            <h3 className="font-inter mt-6 text-[clamp(32px,4vw,56px)] tracking-[-0.02em] leading-[1.05]">
+              Üç adımda <span className="font-serif-i text-white/75">tercih listenizi</span> oluşturun.
+            </h3>
+          </div>
+        </div>
+
+        <div className="relative">
+          {/* connecting hairline */}
+          <div aria-hidden className="hidden md:block absolute top-[44px] left-[8%] right-[8%] h-px bg-white/10"/>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-px md:gap-10">
+            {steps.map(s => (
+              <div key={s.k} className="bg-black md:bg-transparent p-2">
+                <div className="relative">
+                  <span className="w-[88px] h-[88px] rounded-full flex items-center justify-center font-inter text-[28px] font-medium relative z-10 mx-auto md:mx-0"
+                    style={{background:'oklch(0.20 0.05 35)', color:'var(--coral)', boxShadow:'0 0 0 1px oklch(0.74 0.14 35 / 0.4), 0 0 60px oklch(0.74 0.14 35 / 0.3)'}}>
+                    {s.k}
+                  </span>
+                </div>
+                <h4 className="font-inter mt-7 text-[24px] tracking-tight">{s.t}</h4>
+                <p className="mt-3 text-white/65 text-[15px] leading-relaxed max-w-[320px]">{s.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- FAQ ---------- */
+function FAQ() {
+  const items = [
+    { q:'Sıralamamı bilmiyorum, yine de kullanabilir miyim?', a:'Evet. Yaklaşık bir sıralama girerek başlayabilir, sonuçlardaki "yerleşilebilir / hedef / güvenli" aralıklarıyla kendi seviyenizi kalibre edebilirsiniz. ÖSYM sonuçları açıklandıktan sonra gerçek sıralamanızla yeniden filtreleyebilirsiniz.' },
+    { q:'Sonuçlarda hangi yıla ait veriler gösteriliyor?', a:'Varsayılan olarak en güncel ÖSYM yerleştirme verisi (2025) gösterilir. Her programın detay sayfasında 2021–2025 arası tüm taban puan ve sıralama hareketlerine erişebilirsiniz.' },
+    { q:'Tercih listemi kaydedebilir miyim?', a:'Ücretsiz hesap açtıktan sonra beğendiğiniz programları kendi listenize ekleyebilir, sıralayabilir ve cihazlar arasında senkronlayabilirsiniz. Liste indirme ve paylaşma da desteklenir.' },
+    { q:'Tahminler ne kadar güvenilir?', a:'Sunduğumuz değerler tahmin değil, geçmiş yerleştirme verisidir. Her sayfada hangi yılın verisini gördüğünüz açıkça belirtilir; gelecek yıl için olası dalgalanmaları trend grafikleri üzerinden siz değerlendirirsiniz.' },
+    { q:'Tercih robotu YÖK\'ün resmi bir platformu mu?', a:'Hayır. Tercih.robotu bağımsız bir araçtır. Tüm veriler ÖSYM ve YÖK Atlas\'ın kamuya açık kaynaklarına dayanır; resmi tercih işlemleri yalnızca ÖSYM üzerinden yapılır.' },
+  ];
+  return (
+    <section className="relative bg-black text-white px-10 py-28 border-t border-white/10">
+      <div className="max-w-[980px] mx-auto">
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-3 text-[11px] font-medium" style={{letterSpacing:'0.18em', color:'var(--coral)'}}>
+            <span className="w-8 h-px" style={{background:'var(--coral)'}}></span>
+            <span>SIKÇA SORULANLAR</span>
+            <span className="w-8 h-px" style={{background:'var(--coral)'}}></span>
+          </div>
+          <h2 className="font-inter mt-6 text-[clamp(30px,3.4vw,50px)] tracking-[-0.02em] leading-[1.1]">
+            Tercih sürecinin <span className="font-serif-i text-white/75">en sık takılan</span> yerleri.
+          </h2>
+        </div>
+
+        <div className="divide-y divide-white/10 border-y border-white/10">
+          {items.map((it,i) => (
+            <details key={i} className="group">
+              <summary className="py-6 flex items-start gap-6">
+                <span className="font-mono text-[11px] text-white/45 mt-1.5">{String(i+1).padStart(2,'0')}</span>
+                <span className="flex-1 font-inter text-[19px] md:text-[22px] tracking-[-0.01em]">{it.q}</span>
+                <span className="faq-chev mt-1 w-9 h-9 rounded-full border border-white/15 flex items-center justify-center shrink-0">
+                  <Plus size={14}/>
+                </span>
+              </summary>
+              <div className="pb-7 pl-[44px] pr-12 text-[15px] text-white/70 leading-[1.7] max-w-[760px]">
+                {it.a}
+              </div>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- FINAL CTA ---------- */
+function CTA() {
+  const scrollToAra = (e) => {
+    e.preventDefault();
+    document.getElementById('ara')?.scrollIntoView({behavior:'smooth', block:'center'});
+  };
+  return (
+    <section className="relative bg-black px-6 md:px-10 py-24">
+      <div className="relative max-w-[1280px] mx-auto rounded-[40px] overflow-hidden p-12 md:p-20"
+        style={{background:'linear-gradient(140deg, oklch(0.16 0.03 250) 0%, oklch(0.08 0.01 250) 60%, #000 100%)'}}>
+        <div aria-hidden className="pointer-events-none absolute -top-32 -right-20 w-[560px] h-[560px] rounded-full"
+          style={{background:'radial-gradient(circle, var(--coral-soft), transparent 65%)', filter:'blur(40px)'}}/>
+        <div aria-hidden className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <span className="font-display text-[26vw] leading-none text-white/[0.04]">∞</span>
+        </div>
+
+        <div className="relative text-center">
+          <div className="inline-flex items-center gap-3 text-[11px] font-medium" style={{letterSpacing:'0.18em', color:'var(--coral)'}}>
+            <span className="w-8 h-px" style={{background:'var(--coral)'}}></span>
+            <span>HAZIR MISINIZ?</span>
+            <span className="w-8 h-px" style={{background:'var(--coral)'}}></span>
+          </div>
+          <h2 className="font-inter mt-8 text-[clamp(40px,5.6vw,82px)] leading-[1.02] tracking-[-0.03em]">
+            Tercih süreciniz<br/>
+            <span className="font-serif-i text-white/75">bu sayfada başlasın.</span>
+          </h2>
+          <p className="mt-7 text-white/65 text-[16px] max-w-[560px] mx-auto leading-relaxed">
+            Sıralamanızı girin, programları keşfedin, listenizi kaydedin. Üç adım,
+            sıfır karmaşa — tamamen ücretsiz.
+          </p>
+          <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <button onClick={scrollToAra} className="bg-white text-black text-[15px] font-medium rounded-full px-8 py-3.5 transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] hover:shadow-[0_0_32px_4px_rgba(255,255,255,0.2)]">
+              Aramaya başla
+            </button>
+            <a href="/kayit" className="liquid-glass rounded-full px-7 py-3.5 text-[14px] font-medium text-white/90 hover:text-white inline-flex items-center gap-2">
+              Ücretsiz hesap aç <ArrowRight/>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- FOOTER ---------- */
+function Footer() {
+  const groups = [
+    { h:'Keşfet', l:['Sonuçlar','Trendler','Üniversiteler','Bölümler','Şehirler'] },
+    { h:'Hesap',  l:['Ücretsiz kayıt','Giriş','Tercih listem','Karşılaştır'] },
+    { h:'Kurum',  l:['Hakkımızda','Blog','İletişim','Gizlilik','Şartlar'] },
+  ];
+  return (
+    <footer className="relative bg-black text-white px-10 pt-24 pb-10 border-t border-white/10">
+      <div className="max-w-[1280px] mx-auto">
+        <div className="grid grid-cols-12 gap-10 pb-16">
+          <div className="col-span-12 md:col-span-5">
+            <div className="font-inter text-[32px] font-semibold tracking-tight">Tercih<span className="font-serif-i text-white/70">.</span>robotu</div>
+            <p className="mt-5 text-white/60 text-[15px] max-w-[400px] leading-relaxed">
+              200+ üniversite, 11.500+ program ve beş yıllık ÖSYM verisi tek bir sayfada.
+              Geleceğinizi tahminle değil, veriyle planlayın.
+            </p>
+            <div className="mt-6 text-[11px] text-white/40" style={{letterSpacing:'0.14em'}}>
+              ÖSYM RESMİ KAYNAKLARI · BAĞIMSIZ PLATFORM
+            </div>
+          </div>
+          {groups.map(g => (
+            <div key={g.h} className="col-span-6 md:col-span-2">
+              <div className="text-[11px] text-white/45 mb-5" style={{letterSpacing:'0.18em'}}>{g.h.toUpperCase()}</div>
+              <ul className="space-y-3">
+                {g.l.map(item => <li key={item}><a href="#" className="text-[14px] text-white/80 hover:text-white">{item}</a></li>)}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pt-8 border-t border-white/10 text-[11px] text-white/45" style={{letterSpacing:'0.12em'}}>
+          <div>© 2026 TERCİH.ROBOTU — TÜM HAKLARI SAKLIDIR</div>
+          <div className="flex items-center gap-6">
+            <a href="#" className="hover:text-white">GİZLİLİK</a>
+            <a href="#" className="hover:text-white">ŞARTLAR</a>
+            <a href="#" className="hover:text-white">İLETİŞİM</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+/* ---------- APP ---------- */
+function App() {
+  return (
+    <div className="min-h-screen bg-black text-white overflow-x-hidden" style={{ fontFamily: "'Inter', sans-serif" }}>
+      <Header/>
+      <Hero/>
+      <Marquee/>
+      <Intro/>
+      <Feature01/>
+      <Feature02/>
+      <Feature03/>
+      <HowItWorks/>
+      <FAQ/>
+      <CTA/>
+      <Footer/>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
