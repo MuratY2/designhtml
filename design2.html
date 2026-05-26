@@ -23,7 +23,7 @@
     --red-deep:#b41a10;
   }
   *{box-sizing:border-box}
-  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:"Geist",ui-sans-serif,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:"Geist",ui-sans-serif,system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
   a{color:inherit;text-decoration:none}
   img{display:block;max-width:100%}
   .mono{font-family:"Geist Mono",ui-monospace,monospace;letter-spacing:.02em}
@@ -51,7 +51,6 @@
   .hero{position:relative;overflow:hidden;min-height:calc(100vh - 78px);background:#070303}
   .hero-bg{position:absolute;inset:0;z-index:0;overflow:hidden}
   .chess-wrap{position:absolute;top:50%;right:-4%;transform:translateY(-50%);width:78%;max-width:1180px;aspect-ratio:1664/975}
-  .chess-wrap video{width:100%;height:100%;object-fit:contain;object-position:center;filter:saturate(1.1) contrast(1.05) drop-shadow(0 0 80px rgba(255,40,20,.35));-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 18%,#000 100%),linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.15) 10%,rgba(0,0,0,.55) 20%,#000 32%,#000 100%);-webkit-mask-composite:source-in;mask-image:linear-gradient(to right,transparent 0%,#000 18%,#000 100%),linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.15) 10%,rgba(0,0,0,.55) 20%,#000 32%,#000 100%);mask-composite:intersect}
   .chess-wrap img{width:100%;height:100%;object-fit:contain;object-position:center;filter:saturate(1.1) contrast(1.05) drop-shadow(0 0 80px rgba(255,40,20,.35));-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 18%,#000 100%),linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.15) 10%,rgba(0,0,0,.55) 20%,#000 32%,#000 100%);-webkit-mask-composite:source-in;mask-image:linear-gradient(to right,transparent 0%,#000 18%,#000 100%),linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.15) 10%,rgba(0,0,0,.55) 20%,#000 32%,#000 100%);mask-composite:intersect}
   @keyframes float{
     0%,100%{transform:translateY(-50%) scale(1)}
@@ -76,7 +75,7 @@
     radial-gradient(50% 45% at 70% 42%,rgba(255,45,20,.14),transparent 65%),
     linear-gradient(to right,rgba(7,3,3,1) 0%,rgba(7,3,3,.86) 18%,rgba(7,3,3,.28) 42%,rgba(7,3,3,0) 60%),
     linear-gradient(to bottom,rgba(7,3,3,.55) 0%,rgba(7,3,3,0) 12%,rgba(7,3,3,0) 50%,rgba(7,3,3,.4) 70%,rgba(7,3,3,.92) 90%,rgba(7,3,3,1) 100%)}
-  .hero-inner{position:relative;z-index:3;padding:30px 0 220px;min-height:calc(100vh - 78px);display:flex;flex-direction:column}
+  .hero-inner{position:relative;z-index:3;padding-top:30px;padding-bottom:220px;min-height:calc(100vh - 78px);display:flex;flex-direction:column}
 
   /* hero top meta strip */
   .hero-strip{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#a59a93;letter-spacing:.16em;text-transform:uppercase}
@@ -216,22 +215,147 @@
   .foot-cta .it{font-family:"Instrument Serif",serif;font-style:italic;color:var(--accent)}
   .foot-bottom{margin-top:60px;padding-top:24px;border-top:1px solid var(--line);display:flex;justify-content:space-between;font-family:"Geist Mono",monospace;font-size:11px;color:#8d837d;text-transform:uppercase;letter-spacing:.14em}
 
+  /* ---------- hamburger + mobile menu (hidden on desktop) ---------- */
+  .hamburger{display:none;width:42px;height:42px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line-2);cursor:pointer;padding:0;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+  .hamburger span{display:block;width:18px;height:1.5px;background:#fff;border-radius:1px;transition:transform .25s ease,opacity .25s ease}
+  .hamburger[aria-expanded="true"] span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+  .hamburger[aria-expanded="true"] span:nth-child(2){opacity:0}
+  .hamburger[aria-expanded="true"] span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+  .mobile-menu{position:fixed;inset:0;z-index:49;background:rgba(7,3,3,.97);backdrop-filter:blur(14px);opacity:0;visibility:hidden;transition:opacity .25s ease,visibility .25s ease;padding:96px 28px 40px;overflow-y:auto}
+  .mobile-menu.open{opacity:1;visibility:visible}
+  .mobile-menu-inner{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:32px}
+  .mobile-menu nav{display:flex;flex-direction:column;gap:4px}
+  .mobile-menu nav a{padding:14px 18px;border-radius:14px;font-size:18px;color:#cfc7c1;border:1px solid transparent;transition:.18s}
+  .mobile-menu nav a.active{background:var(--accent);color:#0a0606;font-weight:500}
+  .mobile-menu nav a:not(.active):hover{background:rgba(255,255,255,.05);color:#fff;border-color:var(--line)}
+  .mobile-menu-actions{display:flex;flex-direction:column;gap:10px}
+  .mobile-menu-actions .btn{justify-content:center;padding:15px 20px;font-size:15px}
+  body.menu-open{overflow:hidden}
+
+  /* ---------- responsive tiers ---------- */
+  /* Tier 1: ≤1100px — tablet landscape. Pull hero image back in, ease typography. */
   @media (max-width: 1100px){
+    .wrap{padding:0 24px}
     .hero{min-height:auto}
-    .hero-inner{min-height:auto;padding:24px 0 280px}
-    .chess-wrap{width:120%;right:-30%;opacity:.7}
-    .halo{right:-10%;width:110vw;height:110vw}
-    .ht{font-size:60px}
+    .hero-inner{min-height:auto;padding-top:24px;padding-bottom:260px}
+    .chess-wrap{width:88%;right:-8%;opacity:.85}
+    .halo{right:-4%;width:80vw;height:80vw}
+    .ht{font-size:clamp(48px,8.5vw,88px)}
     .hero-belt{gap:18px}
-    .hero-belt .meta{margin-left:0;text-align:left}
-    .marquee-inner{grid-template-columns:1fr 1fr}
-    .triple{grid-template-columns:1fr}
-    .moves{grid-template-columns:1fr}
-    .m1,.m2,.m3,.m4,.m5,.m6{grid-column:span 1}
-    .mission h2{font-size:38px}
-    .foot-grid{grid-template-columns:1fr}
-    .foot-cta{font-size:38px}
+    .triple{grid-template-columns:1fr;padding:50px 0 80px}
+    .mission{padding:110px 0 80px}
+    .mission h2{font-size:44px}
+    .playbook h3{font-size:42px}
+    .playbook .head{flex-direction:column;align-items:flex-start;gap:18px}
+    .playbook .desc{max-width:600px}
+    .moves{grid-template-columns:repeat(6,1fr);gap:12px}
+    .m1{grid-column:span 6}
+    .m2{grid-column:span 6}
+    .m3{grid-column:span 3}
+    .m4{grid-column:span 3}
+    .m5{grid-column:span 6}
+    .m6{grid-column:span 6}
+    .foot-grid{grid-template-columns:1.4fr 1fr 1fr;gap:32px}
+    .foot-cta{font-size:42px}
   }
+
+  /* Tier 2: ≤900px — tablet portrait. Marquee collapses, hero pads more for stacked layout. */
+  @media (max-width: 900px){
+    .nav-shell{padding:14px 0}
+    .navpill{display:none}
+    .ghost{display:none}
+    .chess-wrap{width:100%;right:-12%;opacity:.7}
+    .hero-inner{padding-top:20px;padding-bottom:340px}
+    .marquee-inner{grid-template-columns:repeat(2,1fr)}
+    .hero-belt{flex-direction:column;align-items:flex-start;gap:22px}
+    .hero-belt .meta{margin-left:0;text-align:left}
+    .hero-ctas{flex-wrap:wrap}
+    .mission h2{font-size:36px}
+    .mission{padding:90px 0 70px}
+    .results .num{font-size:120px}
+    .studio .img{height:200px}
+    .testimonial{grid-template-columns:80px 1fr;gap:14px}
+    .avatar{width:80px;height:80px}
+    .logos .row{grid-template-columns:repeat(3,1fr);gap:24px 16px;row-gap:24px}
+    .foot-cta{font-size:36px}
+    .foot-grid{grid-template-columns:1fr 1fr;gap:28px}
+    .foot-grid > div:first-child{grid-column:1 / -1}
+  }
+
+  /* Tier 3: ≤720px — phone. Hamburger appears, image becomes faded backdrop, single-column everywhere. */
+  @media (max-width: 720px){
+    .menu-btn{display:none}
+    .hamburger{display:inline-flex}
+    .wrap{padding:0 18px}
+    /* Hero restructure: marquee flows in document, title sits naturally at top */
+    .hero{min-height:auto;overflow:hidden}
+    .hero-inner{padding-top:18px;padding-bottom:32px;min-height:auto;display:block}
+    .hero-title-block{margin:32px 0 0}
+    /* Image sits behind the text — anchored to fill the hero from top, queen visible behind title */
+    .chess-wrap{width:160%;height:auto;aspect-ratio:1664/975;right:auto;left:-30%;top:60px;bottom:auto;transform:none;opacity:.32;-webkit-mask-image:radial-gradient(ellipse 60% 70% at 50% 45%,#000 20%,rgba(0,0,0,.4) 55%,transparent 85%);mask-image:radial-gradient(ellipse 60% 70% at 50% 45%,#000 20%,rgba(0,0,0,.4) 55%,transparent 85%)}
+    /* Reset desktop image edge fades — radial mask on parent handles blending now */
+    .chess-wrap img{filter:saturate(1.3) contrast(1.15);-webkit-mask-image:none;mask-image:none}
+    .halo{display:none}
+    /* Reduce dark overlay so image is visible, but keep top fade for text legibility */
+    .hero-bg::before{background:
+      linear-gradient(to bottom,rgba(7,3,3,.55) 0%,rgba(7,3,3,.25) 25%,rgba(7,3,3,.1) 50%,rgba(7,3,3,.65) 88%,rgba(7,3,3,.95) 100%)}
+    .hero-strip{font-size:10px;flex-wrap:wrap;gap:6px}
+    .ht{font-size:clamp(40px,10vw,64px);line-height:.96}
+    .hero-belt .desc{font-size:13px}
+    .hero-ctas{width:100%}
+    .hero-ctas .btn{flex:1;justify-content:center;min-width:0}
+    /* Marquee flows in-document now (not absolute) */
+    .marquee{position:static;margin-top:48px;bottom:auto;left:auto;right:auto}
+    .marquee-inner{grid-template-columns:1fr 1fr}
+    .mq{padding:14px 16px}
+    .mq .v{font-size:26px}
+    .mission{padding:70px 0 60px}
+    .mission h2{font-size:28px}
+    .mission .sig{flex-wrap:wrap}
+    .mission .sig span{font-size:10px;flex:1 1 100%;word-break:break-word}
+    .triple{padding:40px 0 60px;gap:18px}
+    .studio .padded{padding:22px}
+    .studio .head{flex-wrap:wrap;gap:10px}
+    .studio .where{font-size:26px}
+    .studio .img{margin:16px 18px 18px;height:180px}
+    .results{padding:22px}
+    .results .num{font-size:90px}
+    .testimonial{grid-template-columns:1fr;gap:14px}
+    .avatar{width:64px;height:64px}
+    .testimonial .quote{font-size:15px}
+    .logos{padding:36px 0}
+    .logos .row{grid-template-columns:repeat(2,1fr);gap:20px}
+    .playbook{padding:60px 0 80px}
+    .playbook h3{font-size:32px}
+    .moves{grid-template-columns:1fr;gap:10px}
+    .m1,.m2,.m3,.m4,.m5,.m6{grid-column:span 1}
+    .move{padding:20px;min-height:200px}
+    .move h4{font-size:24px}
+    .foot-band{padding:60px 0 80px}
+    .foot-grid{grid-template-columns:1fr;gap:36px}
+    .foot-cta{font-size:30px}
+    .foot-bottom{flex-direction:column;gap:8px;text-align:left;align-items:flex-start}
+  }
+
+  /* Tier 4: ≤420px — small phone. Final tightening. */
+  @media (max-width: 420px){
+    .wrap{padding:0 14px}
+    .brand{font-size:16px}
+    .hero-strip{font-size:9px}
+    .hero-inner{padding-top:14px;padding-bottom:28px}
+    .ht{font-size:clamp(36px,11vw,52px)}
+    .hero-ctas{flex-direction:column}
+    .hero-ctas .btn{width:100%}
+    .marquee{margin-top:36px}
+    .marquee-inner{grid-template-columns:1fr}
+    .mission h2{font-size:24px}
+    .results .num{font-size:72px}
+    .playbook h3{font-size:26px}
+    .foot-cta{font-size:26px}
+  }
+
+  /* Safety: prevent any grid item from blowing horizontal layout via long unbreakable words */
+  .move,.mq,.foot-grid > div,.results,.studio,.testimonial,.hero-belt > *{min-width:0}
 </style>
 </head>
 <body>
@@ -252,16 +376,37 @@
         <span class="bars" aria-hidden="true"><i></i><i></i><i></i></span>
         Book intro
       </button>
+      <button class="hamburger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </button>
     </div>
   </div>
 </header>
+
+<div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+  <div class="mobile-menu-inner">
+    <nav aria-label="Mobile">
+      <a href="#" class="active">Home</a>
+      <a href="#">Playbook</a>
+      <a href="#">Case Files</a>
+      <a href="#">Studio</a>
+      <a href="#">Journal</a>
+    </nav>
+    <div class="mobile-menu-actions">
+      <button class="btn" type="button">Sign in</button>
+      <button class="btn primary" type="button">Book intro <span class="ico">→</span></button>
+    </div>
+  </div>
+</div>
 
 <!-- ============== HERO ============== -->
 <section class="hero">
   <div class="hero-bg">
     <div class="halo"></div>
     <div class="chess-wrap">
-      <video id="chess-video" src="https://res.cloudinary.com/dl7kdtfms/video/upload/v1779627134/veo-video-1779627106297_tsvmqc.mp4" autoplay muted playsinline preload="auto"></video>
+      <img src="https://res.cloudinary.com/dl7kdtfms/image/upload/v1779626260/gptimage2_d3oahh.png" alt="" />
     </div>
     <div class="embers" aria-hidden="true">
       <span style="left:6%;animation-duration:14s;animation-delay:0s"></span>
@@ -530,47 +675,37 @@
 
 <script>
 (function(){
-  var v = document.getElementById('chess-video');
-  if(!v) return;
-  var reversing = false;
-  var rafId = null;
-  var lastFrameTime = 0;
-  // Step backwards using rAF; rate ~ playbackRate equivalent at 1x
-  function reverseStep(now){
-    if(!reversing) return;
-    if(!lastFrameTime) lastFrameTime = now;
-    var dt = (now - lastFrameTime) / 1000; // seconds elapsed
-    lastFrameTime = now;
-    var next = v.currentTime - dt;
-    if(next <= 0){
-      v.currentTime = 0;
-      reversing = false;
-      lastFrameTime = 0;
-      v.play().catch(function(){});
-      return;
-    }
-    v.currentTime = next;
-    rafId = requestAnimationFrame(reverseStep);
+  var btn = document.querySelector('.hamburger');
+  var menu = document.getElementById('mobile-menu');
+  if(!btn || !menu) return;
+  function close(){
+    btn.setAttribute('aria-expanded','false');
+    menu.setAttribute('aria-hidden','true');
+    menu.classList.remove('open');
+    document.body.classList.remove('menu-open');
   }
-  v.addEventListener('ended', function(){
-    // Some browsers fire ended slightly before duration; clamp.
-    if(v.duration && isFinite(v.duration)){
-      v.currentTime = v.duration;
-    }
-    reversing = true;
-    lastFrameTime = 0;
-    rafId = requestAnimationFrame(reverseStep);
+  function open(){
+    btn.setAttribute('aria-expanded','true');
+    menu.setAttribute('aria-hidden','false');
+    menu.classList.add('open');
+    document.body.classList.add('menu-open');
+  }
+  btn.addEventListener('click', function(){
+    if(menu.classList.contains('open')) close(); else open();
   });
-  // Safety: if user navigates away/back, ensure we resume forward play if not reversing
-  document.addEventListener('visibilitychange', function(){
-    if(document.hidden){
-      if(rafId){ cancelAnimationFrame(rafId); rafId = null; }
-    } else if(reversing){
-      lastFrameTime = 0;
-      rafId = requestAnimationFrame(reverseStep);
-    }
+  // Close on link tap
+  menu.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', close);
+  });
+  // Close on Escape
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && menu.classList.contains('open')) close();
+  });
+  // Close if viewport grows past the breakpoint (e.g. orientation change)
+  window.addEventListener('resize', function(){
+    if(window.innerWidth > 720 && menu.classList.contains('open')) close();
   });
 })();
 </script>
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>
+</body>
 </html>
